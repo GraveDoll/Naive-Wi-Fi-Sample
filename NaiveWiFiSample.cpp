@@ -20,17 +20,16 @@
 static bool bScanWait = true;
 
 
-//無線に関する通知を行うコールバック関数
+//Callback function for notification of wireess LAN
 static void WlanNotification(WLAN_NOTIFICATION_DATA *wlanNotifData, VOID *p)
 {
 
-	//ワイド文字列格納バッファ
 	WCHAR	wStrW[50];
 
 	size_t wLen = 0;
 	errno_t err = 0;
 
-	//ロケール指定
+	//set your locale
 	setlocale(LC_ALL, "japanese");
 	WCHAR strReason[1024];
 
@@ -234,7 +233,7 @@ bool connect(HANDLE hClient, const GUID *guid, LPCWSTR ssid, LPCWSTR securityKey
 		free(wStrC);
 	}
 
-	//接続パラメータ設定
+	//Set connection params
 	ZeroMemory(&wlanConnectionParams, sizeof(WLAN_CONNECTION_PARAMETERS));
 	wlanConnectionParams.wlanConnectionMode = wlan_connection_mode_profile;
 	wlanConnectionParams.strProfile = ssid;
@@ -243,7 +242,7 @@ bool connect(HANDLE hClient, const GUID *guid, LPCWSTR ssid, LPCWSTR securityKey
 	wlanConnectionParams.dot11BssType = dot11_BSS_type_infrastructure;
 	wlanConnectionParams.dwFlags = 0;
 
-	//プロファイル作成
+	//Create profile
 	if (securityKey != NULL) {
 		wchar_t strXml[1024];
 		LPCWSTR key = securityKey;
@@ -275,7 +274,7 @@ bool connect(HANDLE hClient, const GUID *guid, LPCWSTR ssid, LPCWSTR securityKey
 			L"</WLANProfile>\n";
 		_snwprintf_s(strXml, _countof(strXml), profileFormat, ssid, ssid, key);
 
-		//作成したプロファイルの登録
+		//Register created profile 
 		dwResult = WlanSetProfile(hClient, guid, 0, strXml, 0, true, NULL, &dwReasonCode);
 		if (dwResult != ERROR_SUCCESS) {
 			switch (dwResult)
@@ -291,7 +290,7 @@ bool connect(HANDLE hClient, const GUID *guid, LPCWSTR ssid, LPCWSTR securityKey
 		}
 	}
 
-	//作成したプロファイルで接続
+	//Conenct via created profile
 	dwResult = WlanConnect(hClient, guid, &wlanConnectionParams, NULL);
 	if (dwResult != ERROR_SUCCESS) {
 		switch (dwResult)
@@ -406,14 +405,14 @@ int wmain()
 			}
 			wprintf(L"\n");
 
-			//コールバックの登録
+			//Register the callback
 			dwResult = WlanRegisterNotification(hClient, WLAN_NOTIFICATION_SOURCE_ACM | WLAN_NOTIFICATION_SOURCE_MSM, FALSE, (WLAN_NOTIFICATION_CALLBACK)WlanNotification, NULL, NULL, &dwPrevNotif);
 			if (dwResult != ERROR_SUCCESS) {
 				wprintf(L"WlanRegisterNotification failed with error: %u\n", dwResult);
 				return 1;
 			}
 
-			//利用可能なネットワークをスキャン
+			//Scan available netoworks
 			dwResult = WlanScan(hClient, &pIfInfo->InterfaceGuid, NULL, NULL, NULL);
 			if (dwResult != ERROR_SUCCESS) {
 				wprintf(L"WlanScan failed with error: %u\n", dwResult);
@@ -568,11 +567,11 @@ int wmain()
 
 	}
 
-	wprintf(L"SSIDを入力してください\n");
+	wprintf(L"Enter SSID\n");
 	wchar_t ssid[36];
 	wscanf_s(L"%ls", ssid, 36);
 
-	wprintf(L"セキュリティキーを入力してください\n");
+	wprintf(L"Enter security key\n");
 	wchar_t securityKey[36];
 	wscanf_s(L"%ls", securityKey, 36);
 
