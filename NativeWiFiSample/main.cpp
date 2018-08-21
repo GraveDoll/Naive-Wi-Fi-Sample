@@ -566,11 +566,11 @@ int wmain()
 
 	}
 
-	wprintf(L"Enter SSID\n");
+	wprintf(L"Enter SSID:\n");
 	wchar_t ssid[36];
 	wscanf_s(L"%ls", ssid, 36);
 
-	wprintf(L"Enter security key\n");
+	wprintf(L"Enter security key:\n");
 	wchar_t securityKey[36];
 	wscanf_s(L"%ls", securityKey, 36);
 
